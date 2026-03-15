@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Mattematchen</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pitch-green: #2d8a4e;
+    --pitch-dark: #1a5c32;
+    --pitch-light: #3aad62;
+    --gold: #ffd700;
+    --gold-dark: #c5a200;
+    --white: #ffffff;
+    --dark: #1a1a2e;
+    --red: #e74c3c;
+    --blue: #2980b9;
+    --cell-size: 44px;
+    --cell-font: 24px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--pitch-dark);
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  .pitch-bg {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(0deg, var(--pitch-green) 0px, var(--pitch-green) 40px, var(--pitch-light) 40px, var(--pitch-light) 80px);
+    z-index: 0;
+  }
+  .pitch-bg::before {
+    content: ''; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); width: 200px; height: 200px;
+    border-radius: 50%; border: 4px solid rgba(255,255,255,0.15);
+  }
+  .pitch-bg::after {
+    content: ''; position: absolute; top: 0; left: 50%;
+    transform: translateX(-50%); width: 4px; height: 100%;
+    background: rgba(255,255,255,0.1);
+  }
+
+  .app-container {
+    position: relative; z-index: 1; max-width: 700px;
+    margin: 0 auto; padding: 10px 12px 16px;
+  }
+
+  .header { text-align: center; margin-bottom: 8px; }
+  .header h1 {
+    font-family: 'Bangers', cursive; font-size: 2.2rem; color: var(--white);
+    text-shadow: 3px 3px 0 var(--dark), 0 0 20px rgba(255,215,0,0.4);
+    letter-spacing: 3px; line-height: 1;
+  }
+  .header h1 span { color: var(--gold); }
+  .header .subtitle { font-size: 0.8rem; color: rgba(255,255,255,0.8); font-weight: 700; margin-top: 2px; }
+
+  /* Scoreboard */
+  .scoreboard {
+    display: flex; justify-content: center; align-items: center; gap: 14px;
+    margin-bottom: 8px; background: var(--dark); border-radius: 10px;
+    padding: 8px 14px; border: 2px solid var(--gold);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  .score-item { text-align: center; }
+  .score-label {
+    font-size: 0.55rem; color: rgba(255,255,255,0.6);
+    text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800;
+  }
+  .score-value { font-family: 'Bangers', cursive; font-size: 1.5rem; color: var(--gold); line-height: 1.1; }
+  .score-value.streak { color: #ff6b6b; }
+  .score-divider { width: 1px; height: 30px; background: rgba(255,255,255,0.15); }
+
+  /* Goal progress dots */
+  .goal-progress {
+    display: flex; align-items: center; gap: 3px;
+  }
+  .goal-dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3);
+    transition: all 0.3s;
+  }
+  .goal-dot.scored {
+    background: var(--gold); border-color: var(--gold);
+    box-shadow: 0 0 6px rgba(255,215,0,0.5);
+  }
+
+  /* Op selector - compact */
+  .op-selector { display: flex; gap: 6px; justify-content: center; margin-bottom: 8px; }
+  .op-btn {
+    font-family: 'Bangers', cursive; font-size: 1.05rem; padding: 6px 16px;
+    border: 2px solid rgba(255,255,255,0.3); border-radius: 50px;
+    background: rgba(0,0,0,0.3); color: var(--white); cursor: pointer;
+    transition: all 0.2s; letter-spacing: 1px; white-space: nowrap;
+  }
+  .op-btn:hover { transform: translateY(-2px); border-color: var(--gold); }
+  .op-btn.active {
+    background: var(--gold); color: var(--dark); border-color: var(--gold);
+    box-shadow: 0 0 15px rgba(255,215,0,0.4);
+  }
+
+  /* Problem card - tighter */
+  .problem-card {
+    background: var(--white); border-radius: 14px; padding: 16px 14px 14px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3); border: 2px solid var(--gold);
+    position: relative; overflow: hidden;
+  }
+  .problem-card::before {
+    content: '⚽'; position: absolute; top: -8px; right: -8px;
+    font-size: 3.5rem; opacity: 0.08;
+  }
+  .problem-question {
+    font-family: 'Bangers', cursive; font-size: 1.15rem; color: var(--dark);
+    text-align: center; margin-bottom: 10px; letter-spacing: 1px;
+  }
+
+  .workspace { display: flex; flex-direction: column; align-items: center; gap: 0; position: relative; }
+  .grid-row { display: flex; align-items: center; gap: 0; position: relative; }
+  .op-symbol {
+    width: var(--cell-size); height: var(--cell-size); display: flex;
+    align-items: center; justify-content: center;
+    font-family: 'Bangers', cursive; font-size: 1.5rem; color: var(--pitch-dark);
+  }
+  .cell {
+    width: var(--cell-size); height: var(--cell-size); display: flex;
+    align-items: center; justify-content: center;
+    font-family: 'Nunito', sans-serif; font-size: var(--cell-font);
+    font-weight: 900; color: var(--dark); position: relative;
+  }
+  .cell-digit { background: transparent; }
+
+  .cell-input {
+    width: var(--cell-size); height: var(--cell-size);
+    border: 2px solid #ccc; border-radius: 8px; text-align: center;
+    font-family: 'Nunito', sans-serif; font-size: var(--cell-font);
+    font-weight: 900; color: var(--dark); background: #f9f9f9;
+    outline: none; transition: all 0.2s; padding: 0;
+  }
+  .cell-input:focus { border-color: var(--pitch-green); box-shadow: 0 0 0 3px rgba(45,138,78,0.2); background: #fff; }
+  .cell-input.correct { border-color: var(--pitch-green); background: #e8f5e9; color: var(--pitch-dark); }
+  .cell-input.incorrect { border-color: var(--red); background: #ffeaea; color: var(--red); animation: shake 0.4s; }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+
+  .carry-row { display: flex; gap: 0; }
+  .carry-cell { width: var(--cell-size); height: 24px; display: flex; align-items: center; justify-content: center; }
+  .carry-input {
+    width: 24px; height: 22px; border: 1.5px dashed #bbb; border-radius: 5px;
+    text-align: center; font-family: 'Nunito', sans-serif; font-size: 13px;
+    font-weight: 800; color: var(--red); background: #fff8f0;
+    outline: none; padding: 0; transition: all 0.2s;
+  }
+  .carry-input:focus { border-color: var(--red); background: #fff; box-shadow: 0 0 0 2px rgba(231,76,60,0.15); }
+  .carry-input.has-value { border-style: solid; background: #fff0e0; }
+
+  .separator { width: 100%; display: flex; justify-content: center; }
+  .sep-line { height: 3px; background: var(--dark); border-radius: 2px; }
+
+  .btn-row { display: flex; gap: 8px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+  .btn {
+    font-family: 'Bangers', cursive; font-size: 1.05rem; padding: 8px 20px;
+    border: none; border-radius: 50px; cursor: pointer; transition: all 0.2s; letter-spacing: 1px;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn:active { transform: translateY(0); }
+  .btn-check { background: var(--pitch-green); color: var(--white); box-shadow: 0 4px 12px rgba(45,138,78,0.4); }
+  .btn-new { background: var(--gold); color: var(--dark); box-shadow: 0 4px 12px rgba(255,215,0,0.4); }
+  .btn-hint { background: var(--blue); color: var(--white); box-shadow: 0 4px 12px rgba(41,128,185,0.4); font-size: 0.95rem; padding: 7px 16px; }
+  .btn-undo { background: #8e44ad; color: var(--white); box-shadow: 0 4px 12px rgba(142,68,173,0.4); font-size: 0.95rem; padding: 7px 16px; }
+
+  .feedback {
+    text-align: center; margin-top: 10px; font-family: 'Bangers', cursive;
+    font-size: 1.3rem; letter-spacing: 2px; min-height: 36px;
+  }
+  .feedback.goal { color: var(--pitch-green); animation: goalCelebrate 0.6s ease-out; }
+  .feedback.miss { color: var(--red); animation: shake 0.4s; }
+
+  @keyframes goalCelebrate {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .goal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100; pointer-events: none; opacity: 0; transition: opacity 0.3s;
+  }
+  .goal-overlay.show { opacity: 1; }
+  .goal-text {
+    font-family: 'Bangers', cursive; font-size: 5rem; color: var(--gold);
+    text-shadow: 4px 4px 0 var(--dark), 0 0 40px rgba(255,215,0,0.6);
+    animation: goalZoom 1s ease-out;
+  }
+  @keyframes goalZoom {
+    0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+    60% { transform: scale(1.2) rotate(5deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+
+  .ball-rain {
+    position: fixed; top: -60px; font-size: 2rem;
+    animation: fallDown 2s ease-in forwards; z-index: 99; pointer-events: none;
+  }
+  @keyframes fallDown {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  .hint-box {
+    background: #fff8e1; border: 2px solid var(--gold-dark); border-radius: 10px;
+    padding: 10px 12px; margin-top: 10px; font-size: 0.8rem;
+    color: #5d4e00; font-weight: 700; line-height: 1.4;
+  }
+  .hint-box .hint-title {
+    font-family: 'Bangers', cursive; font-size: 0.95rem;
+    color: var(--gold-dark); margin-bottom: 2px; letter-spacing: 1px;
+  }
+
+  /* Borrow digit styling */
+  .borrow-digit-cell {
+    width: var(--cell-size); height: var(--cell-size);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; cursor: pointer; user-select: none; transition: transform 0.1s;
+  }
+  .borrow-digit-cell:hover { transform: scale(1.08); }
+  .borrow-digit-cell.no-click { cursor: default; }
+  .borrow-digit-cell.no-click:hover { transform: none; }
+
+  .borrow-digit-main {
+    font-family: 'Nunito', sans-serif; font-size: var(--cell-font);
+    font-weight: 900; color: var(--dark); position: relative; z-index: 1;
+  }
+  .borrow-digit-main.crossed-out { color: var(--red); opacity: 0.55; }
+  .borrow-digit-main.crossed-out::after {
+    content: ''; position: absolute; top: 50%; left: -3px; right: -3px;
+    height: 2.5px; background: var(--red); transform: rotate(-18deg);
+  }
+
+  .borrow-ten-marker {
+    position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
+    font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 900;
+    color: var(--red); z-index: 3; line-height: 1; white-space: nowrap;
+  }
+
+  .borrow-help-text {
+    font-size: 0.7rem; color: #888; text-align: center;
+    margin-bottom: 4px; font-weight: 700;
+  }
+
+  /* Match finished overlay */
+  .match-finished-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.75); display: flex; align-items: center;
+    justify-content: center; z-index: 200; backdrop-filter: blur(4px);
+  }
+  .match-finished-card {
+    background: var(--white); border-radius: 20px; padding: 32px 28px;
+    text-align: center; border: 4px solid var(--gold);
+    box-shadow: 0 12px 48px rgba(0,0,0,0.5); max-width: 340px; width: 90%;
+    animation: goalZoom 0.6s ease-out;
+  }
+  .match-finished-card h2 {
+    font-family: 'Bangers', cursive; font-size: 2.4rem; color: var(--pitch-dark);
+    letter-spacing: 2px; margin-bottom: 8px;
+  }
+  .match-finished-card .trophy { font-size: 3.5rem; margin-bottom: 8px; }
+  .match-finished-card .stats {
+    font-size: 1rem; font-weight: 800; color: var(--dark);
+    margin-bottom: 16px; line-height: 1.8;
+  }
+  .match-finished-card .stats span { color: var(--gold-dark); font-family: 'Bangers', cursive; font-size: 1.3rem; }
+  .btn-restart {
+    font-family: 'Bangers', cursive; font-size: 1.3rem; padding: 12px 36px;
+    border: none; border-radius: 50px; cursor: pointer;
+    background: var(--pitch-green); color: var(--white);
+    box-shadow: 0 4px 16px rgba(45,138,78,0.5); letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+  .btn-restart:hover { transform: translateY(-2px); }
+
+  @media (max-width: 500px) {
+    :root { --cell-size: 38px; --cell-font: 20px; }
+    .header h1 { font-size: 1.8rem; }
+    .carry-input { width: 20px; height: 18px; font-size: 11px; }
+    .goal-text { font-size: 3.5rem; }
+    .scoreboard { gap: 10px; padding: 7px 10px; }
+    .score-value { font-size: 1.3rem; }
+    .goal-dot { width: 10px; height: 10px; }
+    .op-btn { font-size: 0.95rem; padding: 5px 12px; }
+    .problem-card { padding: 12px 10px 10px; }
+    .problem-question { font-size: 1.05rem; margin-bottom: 8px; }
+    .btn { font-size: 0.95rem; padding: 7px 16px; }
+    .borrow-ten-marker { font-size: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="pitch-bg"></div>
+<div class="app-container" id="app"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+
+<script type="text/babel">
+const { useState, useRef, useEffect, useCallback } = React;
+
+const MATCH_GOALS = 10;
+
+function randInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function generateProblem(op) {
+  let a, b;
+  if (op === '+') {
+    a = randInt(100, 9999); b = randInt(100, 9999);
+    return { a, b, op, answer: a + b };
+  } else if (op === '\u2212') {
+    a = randInt(200, 9999); b = randInt(100, a);
+    return { a, b, op, answer: a - b };
+  } else {
+    a = randInt(12, 999); b = randInt(12, 99);
+    return { a, b, op, answer: a * b };
+  }
+}
+
+function digitsArr(n, len) {
+  const s = String(n);
+  const arr = s.split('').map(Number);
+  while (arr.length < len) arr.unshift(null);
+  return arr;
+}
+
+// ─── Main App ───────────────────────────────────────────
+function App() {
+  const [operation, setOperation] = useState('+');
+  const [problem, setProblem] = useState(() => generateProblem('+'));
+  const [score, setScore] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
+  const [attempts, setAttempts] = useState(0);
+  const [feedback, setFeedback] = useState('');
+  const [feedbackType, setFeedbackType] = useState('');
+  const [showGoal, setShowGoal] = useState(false);
+  const [balls, setBalls] = useState([]);
+  const [checked, setChecked] = useState(false);
+  const [hint, setHint] = useState('');
+  const [matchFinished, setMatchFinished] = useState(false);
+
+  const newProblem = useCallback((op) => {
+    setProblem(generateProblem(op));
+    setFeedback(''); setFeedbackType(''); setChecked(false); setHint('');
+  }, []);
+
+  const switchOp = (op) => { setOperation(op); newProblem(op); };
+
+  const celebrateGoal = (newScore) => {
+    setShowGoal(true);
+    const nb = Array.from({ length: 12 }, (_, i) => ({ id: Date.now() + i, left: Math.random() * 100, delay: Math.random() * 0.8 }));
+    setBalls(nb);
+    setTimeout(() => {
+      setShowGoal(false); setBalls([]);
+      if (newScore >= MATCH_GOALS) setMatchFinished(true);
+    }, 2000);
+  };
+
+  const restartMatch = () => {
+    setScore(0); setStreak(0); setBestStreak(0); setAttempts(0);
+    setMatchFinished(false); newProblem(operation);
+  };
+
+  const handleCorrect = () => {
+    const newScore = score + 1;
+    const newStreak = streak + 1;
+    setScore(newScore);
+    setStreak(newStreak);
+    setBestStreak(b => Math.max(b, newStreak));
+    setAttempts(a => a + 1);
+    celebrateGoal(newScore);
+  };
+
+  const handleIncorrect = () => {
+    setStreak(0);
+    setAttempts(a => a + 1);
+  };
+
+  return (
+    <>
+      <div className="header">
+        <h1>⚽ <span>MATTE</span>MATCHEN</h1>
+        <div className="subtitle">Gör {MATCH_GOALS} mål för att vinna matchen!</div>
+      </div>
+
+      <div className="scoreboard">
+        <div className="score-item">
+          <div className="score-label">Mål</div>
+          <div className="score-value">{score}/{MATCH_GOALS}</div>
+        </div>
+        <div className="score-divider"></div>
+        <div className="score-item">
+          <div className="score-label">Försök</div>
+          <div className="score-value">{attempts}</div>
+        </div>
+        <div className="score-divider"></div>
+        <div className="score-item">
+          <div className="score-label">Svit</div>
+          <div className="score-value streak">🔥 {streak}</div>
+        </div>
+        <div className="score-divider"></div>
+        <div className="score-item">
+          <div className="goal-progress">
+            {Array.from({ length: MATCH_GOALS }, (_, i) => (
+              <div key={i} className={`goal-dot ${i < score ? 'scored' : ''}`}></div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="op-selector">
+        {['+', '\u2212', '\u00d7'].map(op => (
+          <button key={op} className={`op-btn ${operation === op ? 'active' : ''}`} onClick={() => switchOp(op)}>
+            {op === '+' ? '➕ Plus' : op === '\u2212' ? '➖ Minus' : '✖️ Gånger'}
+          </button>
+        ))}
+      </div>
+
+      <div className="problem-card">
+        {operation === '\u00d7' ? (
+          <MultiplicationWorkspace problem={problem} checked={checked} setChecked={setChecked}
+            setFeedback={setFeedback} setFeedbackType={setFeedbackType}
+            onCorrect={handleCorrect} onIncorrect={handleIncorrect} />
+        ) : (
+          <AddSubWorkspace problem={problem} checked={checked} setChecked={setChecked}
+            setFeedback={setFeedback} setFeedbackType={setFeedbackType}
+            onCorrect={handleCorrect} onIncorrect={handleIncorrect} />
+        )}
+
+        <div className="btn-row">
+          {!checked && (
+            <button className="btn btn-hint" onClick={() => {
+              if (operation === '\u00d7') setHint('Multiplicera med en siffra i taget! Börja med entalen. Minnessiffra när produkten blir 10 eller mer.');
+              else if (operation === '\u2212') setHint('Börja från höger. Om övre siffran är mindre, klicka på den för att låna! Siffran till vänster stryks och du får +10.');
+              else setHint('Börja från höger. Addera siffrorna plus minnessiffra. Om summan blir 10+, skriv entalet och för över minnessiffran.');
+            }}>💡 Tips</button>
+          )}
+          <button className="btn btn-new" onClick={() => newProblem(operation)}>⚽ Nytt tal</button>
+        </div>
+
+        {feedback && <div className={`feedback ${feedbackType}`}>{feedback}</div>}
+        {hint && <div className="hint-box"><div className="hint-title">💡 Tränarens tips</div>{hint}</div>}
+      </div>
+
+      <div className={`goal-overlay ${showGoal ? 'show' : ''}`}>
+        {showGoal && <div className="goal-text">⚽ MÅÅÅL!!</div>}
+      </div>
+      {balls.map(b => (
+        <div key={b.id} className="ball-rain" style={{ left: b.left + '%', animationDelay: b.delay + 's' }}>⚽</div>
+      ))}
+
+      {/* Match finished overlay */}
+      {matchFinished && (
+        <div className="match-finished-overlay">
+          <div className="match-finished-card">
+            <div className="trophy">🏆</div>
+            <h2>Matchen är slut!</h2>
+            <div className="stats">
+              Du gjorde <span>{MATCH_GOALS} mål</span> på <span>{attempts} försök</span>!<br/>
+              Bästa svit: <span>🔥 {bestStreak}</span>
+            </div>
+            <button className="btn-restart" onClick={restartMatch}>⚽ Ny match!</button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+
+// ─── Addition / Subtraction Workspace ───────────────────
+function AddSubWorkspace({ problem, checked, setChecked, setFeedback, setFeedbackType, onCorrect, onIncorrect }) {
+  const { a, b, op, answer } = problem;
+  const isSubtraction = (op === '\u2212');
+  const ansStr = String(answer);
+  const maxLen = Math.max(String(a).length, String(b).length, ansStr.length);
+  const totalCols = maxLen + 1;
+
+  const aDigitsOrig = digitsArr(a, totalCols);
+  const bDigits = digitsArr(b, totalCols);
+  const ansDigits = digitsArr(answer, totalCols);
+
+  const [answerInputs, setAnswerInputs] = useState({});
+  const [carryInputs, setCarryInputs] = useState({});
+  const [cellStatus, setCellStatus] = useState({});
+  const [borrowGiven, setBorrowGiven] = useState({});
+  const [borrowReceived, setBorrowReceived] = useState({});
+  const inputRefs = useRef({});
+
+  useEffect(() => {
+    setAnswerInputs({}); setCarryInputs({}); setCellStatus({});
+    setBorrowGiven({}); setBorrowReceived({});
+    inputRefs.current = {};
+  }, [problem]);
+
+  const getEffectiveDigit = (col) => {
+    const orig = aDigitsOrig[col];
+    if (orig === null) return null;
+    return orig - (borrowGiven[col] || 0) + (borrowReceived[col] || 0) * 10;
+  };
+
+  const handleBorrow = (col) => {
+    if (checked || !isSubtraction) return;
+    const leftCol = col - 1;
+    if (leftCol < 0) return;
+    const leftEffective = getEffectiveDigit(leftCol);
+    if (leftEffective === null || leftEffective <= 0) return;
+    setBorrowGiven(prev => ({ ...prev, [leftCol]: (prev[leftCol] || 0) + 1 }));
+    setBorrowReceived(prev => ({ ...prev, [col]: (prev[col] || 0) + 1 }));
+  };
+
+  const handleUndoBorrows = () => { setBorrowGiven({}); setBorrowReceived({}); };
+
+  const handleAnswerChange = (col, val) => {
+    if (val.length > 1) val = val.slice(-1);
+    if (val && !/^\d$/.test(val)) return;
+    setAnswerInputs(prev => ({ ...prev, [col]: val }));
+    if (val && col > 0) {
+      const r = inputRefs.current['ans-'+(col-1)];
+      if (r) setTimeout(() => r.focus(), 50);
+    }
+  };
+
+  const handleCarryChange = (col, val) => {
+    if (val.length > 1) val = val.slice(-1);
+    if (val && !/^\d$/.test(val)) return;
+    setCarryInputs(prev => ({ ...prev, [col]: val }));
+  };
+
+  const handleCheck = () => {
+    let enteredDigits = [];
+    for (let c = 0; c < totalCols; c++) enteredDigits.push(answerInputs[c] || '');
+    const enteredStr = enteredDigits.join('').replace(/^0+/, '') || '0';
+
+    const newStatus = {};
+    for (let c = 0; c < totalCols; c++) {
+      const expected = ansDigits[c]; const entered = answerInputs[c] || '';
+      if (expected === null && entered === '') {}
+      else if (String(expected) === entered) newStatus[c] = 'correct';
+      else newStatus[c] = 'incorrect';
+    }
+    setCellStatus(newStatus); setChecked(true);
+
+    if (enteredStr === String(answer)) {
+      setFeedback('⚽ MÅÅÅL! Snyggt jobbat!'); setFeedbackType('goal'); onCorrect();
+    } else {
+      setFeedback(`Inte riktigt! Svaret är ${answer}.`); setFeedbackType('miss'); onIncorrect();
+    }
+  };
+
+  const sepWidth = totalCols * parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cell-size')) + parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cell-size'));
+  const hasBorrows = Object.keys(borrowGiven).length > 0;
+
+  return (
+    <div className="workspace">
+      <div className="problem-question">Vad är {a} {op} {b}?</div>
+
+      {!isSubtraction && (
+        <div className="carry-row">
+          <div className="carry-cell" style={{ width: 'var(--cell-size)' }}></div>
+          {Array.from({ length: totalCols }, (_, c) => (
+            <div className="carry-cell" key={'carry-'+c}>
+              <input className={`carry-input ${carryInputs[c] ? 'has-value' : ''}`}
+                type="text" inputMode="numeric" maxLength={1}
+                value={carryInputs[c] || ''} onChange={e => handleCarryChange(c, e.target.value)}
+                disabled={checked} />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {isSubtraction && !checked && (
+        <div className="borrow-help-text">👆 Klicka på en siffra för att låna</div>
+      )}
+
+      <div className="grid-row">
+        <div className="op-symbol"></div>
+        {aDigitsOrig.map((origD, c) => {
+          if (!isSubtraction) {
+            return <div className="cell cell-digit" key={'a-'+c}>{origD !== null ? origD : ''}</div>;
+          }
+          const given = borrowGiven[c] || 0;
+          const received = borrowReceived[c] || 0;
+          const hasGiven = given > 0;
+          const hasReceived = received > 0;
+          const canBorrow = !checked && origD !== null && c > 0;
+
+          return (
+            <div className={`borrow-digit-cell ${(!canBorrow || checked) ? 'no-click' : ''}`}
+              key={'a-'+c} onClick={() => canBorrow && handleBorrow(c)}
+              title={canBorrow ? 'Klicka för att låna' : ''}>
+              {hasReceived && <span className="borrow-ten-marker">10</span>}
+              <span className={`borrow-digit-main ${hasGiven ? 'crossed-out' : ''}`}>
+                {origD !== null ? origD : ''}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="grid-row">
+        <div className="op-symbol">{op}</div>
+        {bDigits.map((d, c) => (
+          <div className="cell cell-digit" key={'b-'+c}>{d !== null ? d : ''}</div>
+        ))}
+      </div>
+
+      <div className="separator"><div className="sep-line" style={{ width: 'calc(var(--cell-size) * ' + (totalCols + 1) + ')' }}></div></div>
+
+      <div className="grid-row">
+        <div className="op-symbol"></div>
+        {Array.from({ length: totalCols }, (_, c) => (
+          <div className="cell" key={'ans-'+c}>
+            <input ref={el => inputRefs.current['ans-'+c] = el}
+              className={`cell-input ${cellStatus[c] || ''}`}
+              type="text" inputMode="numeric" maxLength={1}
+              value={answerInputs[c] || ''} onChange={e => handleAnswerChange(c, e.target.value)}
+              disabled={checked} />
+          </div>
+        ))}
+      </div>
+
+      {!checked && (
+        <div className="btn-row" style={{ marginTop: 10 }}>
+          <button className="btn btn-check" onClick={handleCheck}>✅ Kolla svar</button>
+          {isSubtraction && hasBorrows && (
+            <button className="btn btn-undo" onClick={handleUndoBorrows}>↩️ Ångra</button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+// ─── Multiplication Workspace ───────────────────────────
+function MultiplicationWorkspace({ problem, checked, setChecked, setFeedback, setFeedbackType, onCorrect, onIncorrect }) {
+  const { a, b, op, answer } = problem;
+
+  const bStr = String(b); const aStr = String(a);
+  const bDigitsArr = bStr.split('').map(Number);
+  const partialProducts = bDigitsArr.map((d, i) => {
+    const posFromRight = bDigitsArr.length - 1 - i;
+    return a * d * Math.pow(10, posFromRight);
+  });
+
+  const ansStr = String(answer);
+  const maxPartialLen = Math.max(...partialProducts.map(p => String(p).length));
+  const maxLen = Math.max(aStr.length, bStr.length, ansStr.length, maxPartialLen);
+  const totalCols = maxLen + 1;
+
+  const aDigits = digitsArr(a, totalCols);
+  const bDigitsPadded = digitsArr(b, totalCols);
+
+  const [partialInputs, setPartialInputs] = useState({});
+  const [finalInputs, setFinalInputs] = useState({});
+  const [carryInputs, setCarryInputs] = useState({});
+  const [cellStatus, setCellStatus] = useState({});
+  const inputRefs = useRef({});
+
+  useEffect(() => {
+    setPartialInputs({}); setFinalInputs({}); setCarryInputs({}); setCellStatus({});
+    inputRefs.current = {};
+  }, [problem]);
+
+  const handlePartialChange = (row, col, val) => {
+    if (val.length > 1) val = val.slice(-1);
+    if (val && !/^\d$/.test(val)) return;
+    setPartialInputs(prev => ({ ...prev, [row+'-'+col]: val }));
+    if (val && col > 0) {
+      const r = inputRefs.current['p-'+row+'-'+(col-1)];
+      if (r) setTimeout(() => r.focus(), 50);
+    }
+  };
+
+  const handleFinalChange = (col, val) => {
+    if (val.length > 1) val = val.slice(-1);
+    if (val && !/^\d$/.test(val)) return;
+    setFinalInputs(prev => ({ ...prev, [col]: val }));
+    if (val && col > 0) {
+      const r = inputRefs.current['f-'+(col-1)];
+      if (r) setTimeout(() => r.focus(), 50);
+    }
+  };
+
+  const handleCarryChange = (row, col, val) => {
+    if (val.length > 1) val = val.slice(-1);
+    if (val && !/^\d$/.test(val)) return;
+    setCarryInputs(prev => ({ ...prev, ['c-'+row+'-'+col]: val }));
+  };
+
+  const checkFinal = (fInputs) => {
+    const ansD = digitsArr(answer, totalCols);
+    let entered = [];
+    for (let c = 0; c < totalCols; c++) entered.push(fInputs[c] || '');
+    const enteredStr = entered.join('').replace(/^0+/, '') || '0';
+
+    const newStatus = {};
+    for (let c = 0; c < totalCols; c++) {
+      const expected = ansD[c]; const ent = fInputs[c] || '';
+      if (expected === null && ent === '') {}
+      else if (String(expected) === ent) newStatus['f-'+c] = 'correct';
+      else newStatus['f-'+c] = 'incorrect';
+    }
+
+    partialProducts.forEach((pp, row) => {
+      const ppD = digitsArr(pp, totalCols);
+      for (let c = 0; c < totalCols; c++) {
+        const expected = ppD[c]; const ent = partialInputs[row+'-'+c] || '';
+        if (expected === null && ent === '') {}
+        else if (String(expected) === ent) newStatus['p-'+row+'-'+c] = 'correct';
+        else if (ent !== '') newStatus['p-'+row+'-'+c] = 'incorrect';
+      }
+    });
+
+    setCellStatus(newStatus); setChecked(true);
+
+    if (enteredStr === String(answer)) {
+      setFeedback('⚽ MÅÅÅL! Briljant!'); setFeedbackType('goal'); onCorrect();
+    } else {
+      setFeedback(`Nästan! Svaret är ${answer}.`); setFeedbackType('miss'); onIncorrect();
+    }
+  };
+
+  const handleCheck = () => {
+    if (partialProducts.length === 1) {
+      const fInputs = {};
+      for (let c = 0; c < totalCols; c++) fInputs[c] = partialInputs['0-'+c] || '';
+      setFinalInputs(fInputs);
+      const ansD = digitsArr(answer, totalCols);
+      let entered = [];
+      for (let c = 0; c < totalCols; c++) entered.push(fInputs[c] || '');
+      const enteredStr = entered.join('').replace(/^0+/, '') || '0';
+      const newStatus = {};
+      for (let c = 0; c < totalCols; c++) {
+        const expected = ansD[c]; const ent = fInputs[c] || '';
+        if (expected === null && ent === '') {}
+        else if (String(expected) === ent) newStatus['p-0-'+c] = 'correct';
+        else newStatus['p-0-'+c] = 'incorrect';
+      }
+      setCellStatus(newStatus); setChecked(true);
+      if (enteredStr === String(answer)) {
+        setFeedback('⚽ MÅÅÅL! Briljant!'); setFeedbackType('goal'); onCorrect();
+      } else {
+        setFeedback(`Nästan! Svaret är ${answer}.`); setFeedbackType('miss'); onIncorrect();
+      }
+    } else {
+      checkFinal(finalInputs);
+    }
+  };
+
+  return (
+    <div className="workspace">
+      <div className="problem-question">Vad är {a} × {b}?</div>
+
+      <div className="carry-row">
+        <div className="carry-cell" style={{ width: 'var(--cell-size)' }}></div>
+        {Array.from({ length: totalCols }, (_, c) => (
+          <div className="carry-cell" key={'ct-'+c}>
+            <input className={`carry-input ${carryInputs['c-top-'+c] ? 'has-value' : ''}`}
+              type="text" inputMode="numeric" maxLength={1}
+              value={carryInputs['c-top-'+c] || ''} onChange={e => handleCarryChange('top', c, e.target.value)} disabled={checked} />
+          </div>
+        ))}
+      </div>
+
+      <div className="grid-row">
+        <div className="op-symbol"></div>
+        {aDigits.map((d,c) => <div className="cell cell-digit" key={'a-'+c}>{d !== null ? d : ''}</div>)}
+      </div>
+
+      <div className="grid-row">
+        <div className="op-symbol">×</div>
+        {bDigitsPadded.map((d,c) => <div className="cell cell-digit" key={'b-'+c}>{d !== null ? d : ''}</div>)}
+      </div>
+
+      <div className="separator"><div className="sep-line" style={{ width: 'calc(var(--cell-size) * ' + (totalCols + 1) + ')' }}></div></div>
+
+      {/* Carry row for adding partial products (replaces DELPRODUKTER label) */}
+      {partialProducts.length > 1 && (
+        <div className="carry-row">
+          <div className="carry-cell" style={{ width: 'var(--cell-size)' }}></div>
+          {Array.from({ length: totalCols }, (_, c) => (
+            <div className="carry-cell" key={'cp-'+c}>
+              <input className={`carry-input ${carryInputs['c-sum-'+c] ? 'has-value' : ''}`}
+                type="text" inputMode="numeric" maxLength={1}
+                value={carryInputs['c-sum-'+c] || ''} onChange={e => handleCarryChange('sum', c, e.target.value)} disabled={checked} />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {partialProducts.map((pp, row) => (
+        <React.Fragment key={'pp-'+row}>
+          <div className="grid-row">
+            <div className="op-symbol" style={{ fontSize: '0.9rem', color: '#999' }}>
+              {partialProducts.length > 1 ? (row === 0 ? '' : '+') : ''}
+            </div>
+            {Array.from({ length: totalCols }, (_, c) => (
+              <div className="cell" key={'p-'+row+'-'+c}>
+                <input ref={el => inputRefs.current['p-'+row+'-'+c] = el}
+                  className={`cell-input ${cellStatus['p-'+row+'-'+c] || ''}`}
+                  type="text" inputMode="numeric" maxLength={1}
+                  value={partialInputs[row+'-'+c] || ''} onChange={e => handlePartialChange(row, c, e.target.value)} disabled={checked} />
+              </div>
+            ))}
+          </div>
+        </React.Fragment>
+      ))}
+
+      {partialProducts.length > 1 && (
+        <>
+          <div className="separator" style={{ marginTop: 4 }}><div className="sep-line" style={{ width: 'calc(var(--cell-size) * ' + (totalCols + 1) + ')' }}></div></div>
+          <div className="grid-row">
+            <div className="op-symbol">=</div>
+            {Array.from({ length: totalCols }, (_, c) => (
+              <div className="cell" key={'f-'+c}>
+                <input ref={el => inputRefs.current['f-'+c] = el}
+                  className={`cell-input ${cellStatus['f-'+c] || ''}`}
+                  type="text" inputMode="numeric" maxLength={1}
+                  value={finalInputs[c] || ''} onChange={e => handleFinalChange(c, e.target.value)} disabled={checked} />
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {!checked && (
+        <div className="btn-row" style={{ marginTop: 10 }}>
+          <button className="btn btn-check" onClick={handleCheck}>✅ Kolla svar</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('app')).render(<App />);
+</script>
+</body>
+</html>
