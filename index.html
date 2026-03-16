@@ -346,8 +346,10 @@ function randInt(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
 
 function generateProblem(op) {
   let a, b;
-  if (op === '+') { a = randInt(100,9999); b = randInt(100,9999); return {a,b,op,answer:a+b}; }
-  else if (op === '\u2212') { a = randInt(200,9999); b = randInt(100,a); return {a,b,op,answer:a-b}; }
+  // 70% chance hundreds (100-999), 30% chance thousands (1000-9999)
+  const pick = () => Math.random() < 0.7 ? randInt(100,999) : randInt(1000,9999);
+  if (op === '+') { a = pick(); b = pick(); return {a,b,op,answer:a+b}; }
+  else if (op === '\u2212') { a = pick(); b = randInt(100, a); return {a,b,op,answer:a-b}; }
   else { a = randInt(12,999); b = randInt(12,99); return {a,b,op,answer:a*b}; }
 }
 
