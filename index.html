@@ -19,17 +19,11 @@
     --cell-size: 44px;
     --cell-font: 24px;
   }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   body {
-    font-family: 'Nunito', sans-serif;
-    background: var(--pitch-dark);
-    min-height: 100vh;
-    min-height: 100dvh;
-    overflow-x: hidden;
+    font-family: 'Nunito', sans-serif; background: var(--pitch-dark);
+    min-height: 100vh; min-height: 100dvh; overflow-x: hidden;
   }
-
   .pitch-bg {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: repeating-linear-gradient(0deg, var(--pitch-green) 0px, var(--pitch-green) 40px, var(--pitch-light) 40px, var(--pitch-light) 80px);
@@ -45,12 +39,10 @@
     transform: translateX(-50%); width: 4px; height: 100%;
     background: rgba(255,255,255,0.1);
   }
-
   .app-container {
     position: relative; z-index: 1; max-width: 700px;
     margin: 0 auto; padding: 10px 12px 16px;
   }
-
   .header { text-align: center; margin-bottom: 8px; }
   .header h1 {
     font-family: 'Bangers', cursive; font-size: 2.2rem; color: var(--white);
@@ -60,7 +52,52 @@
   .header h1 span { color: var(--gold); }
   .header .subtitle { font-size: 0.8rem; color: rgba(255,255,255,0.8); font-weight: 700; margin-top: 2px; }
 
-  /* Scoreboard */
+  /* ─── Start Menu ─── */
+  .menu-card {
+    background: var(--white); border-radius: 16px; padding: 28px 24px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3); border: 3px solid var(--gold);
+    text-align: center; max-width: 380px; margin: 20px auto 0;
+  }
+  .menu-card h2 {
+    font-family: 'Bangers', cursive; font-size: 1.6rem; color: var(--dark);
+    letter-spacing: 1px; margin-bottom: 16px;
+  }
+  .mode-btn {
+    display: block; width: 100%; font-family: 'Bangers', cursive;
+    font-size: 1.3rem; padding: 14px 20px; border: 3px solid var(--gold);
+    border-radius: 14px; cursor: pointer; transition: all 0.2s;
+    letter-spacing: 1px; margin-bottom: 10px; background: var(--white); color: var(--dark);
+  }
+  .mode-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+  .mode-btn.selected { background: var(--gold); color: var(--dark); border-color: var(--gold-dark); }
+  .mode-btn .mode-desc {
+    font-family: 'Nunito', sans-serif; font-size: 0.75rem; font-weight: 700;
+    color: #666; display: block; margin-top: 2px;
+  }
+  .mode-btn.selected .mode-desc { color: #5d4e00; }
+
+  .timer-picker {
+    margin: 16px 0; display: flex; align-items: center; justify-content: center; gap: 12px;
+  }
+  .timer-picker label {
+    font-family: 'Bangers', cursive; font-size: 1.1rem; color: var(--dark); letter-spacing: 1px;
+  }
+  .timer-picker select {
+    font-family: 'Nunito', sans-serif; font-size: 1.1rem; font-weight: 800;
+    padding: 6px 12px; border-radius: 8px; border: 2px solid var(--gold);
+    background: #fff; color: var(--dark); cursor: pointer; outline: none;
+  }
+
+  .btn-start {
+    font-family: 'Bangers', cursive; font-size: 1.4rem; padding: 14px 40px;
+    border: none; border-radius: 50px; cursor: pointer;
+    background: var(--pitch-green); color: var(--white);
+    box-shadow: 0 4px 16px rgba(45,138,78,0.5); letter-spacing: 2px;
+    transition: all 0.2s; margin-top: 8px;
+  }
+  .btn-start:hover { transform: translateY(-2px); }
+
+  /* ─── Scoreboard ─── */
   .scoreboard {
     display: flex; justify-content: center; align-items: center; gap: 14px;
     margin-bottom: 8px; background: var(--dark); border-radius: 10px;
@@ -74,23 +111,22 @@
   }
   .score-value { font-family: 'Bangers', cursive; font-size: 1.5rem; color: var(--gold); line-height: 1.1; }
   .score-value.streak { color: #ff6b6b; }
+  .score-value.timer-val {
+    color: var(--white); font-variant-numeric: tabular-nums; font-size: 1.3rem;
+  }
+  .score-value.timer-val.urgent { color: var(--red); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
   .score-divider { width: 1px; height: 30px; background: rgba(255,255,255,0.15); }
 
-  /* Goal progress dots */
-  .goal-progress {
-    display: flex; align-items: center; gap: 3px;
-  }
+  .goal-progress { display: flex; align-items: center; gap: 3px; }
   .goal-dot {
     width: 12px; height: 12px; border-radius: 50%;
     background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3);
     transition: all 0.3s;
   }
-  .goal-dot.scored {
-    background: var(--gold); border-color: var(--gold);
-    box-shadow: 0 0 6px rgba(255,215,0,0.5);
-  }
+  .goal-dot.scored { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 6px rgba(255,215,0,0.5); }
 
-  /* Op selector - compact */
+  /* ─── Op selector ─── */
   .op-selector { display: flex; gap: 6px; justify-content: center; margin-bottom: 8px; }
   .op-btn {
     font-family: 'Bangers', cursive; font-size: 1.05rem; padding: 6px 16px;
@@ -104,7 +140,7 @@
     box-shadow: 0 0 15px rgba(255,215,0,0.4);
   }
 
-  /* Problem card - tighter */
+  /* ─── Problem card ─── */
   .problem-card {
     background: var(--white); border-radius: 14px; padding: 16px 14px 14px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.3); border: 2px solid var(--gold);
@@ -118,7 +154,6 @@
     font-family: 'Bangers', cursive; font-size: 1.15rem; color: var(--dark);
     text-align: center; margin-bottom: 10px; letter-spacing: 1px;
   }
-
   .workspace { display: flex; flex-direction: column; align-items: center; gap: 0; position: relative; }
   .grid-row { display: flex; align-items: center; gap: 0; position: relative; }
   .op-symbol {
@@ -133,7 +168,6 @@
     font-weight: 900; color: var(--dark); position: relative;
   }
   .cell-digit { background: transparent; }
-
   .cell-input {
     width: var(--cell-size); height: var(--cell-size);
     border: 2px solid #ccc; border-radius: 8px; text-align: center;
@@ -145,11 +179,7 @@
   .cell-input.correct { border-color: var(--pitch-green); background: #e8f5e9; color: var(--pitch-dark); }
   .cell-input.incorrect { border-color: var(--red); background: #ffeaea; color: var(--red); animation: shake 0.4s; }
 
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-4px); }
-    75% { transform: translateX(4px); }
-  }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
 
   .carry-row { display: flex; gap: 0; }
   .carry-cell { width: var(--cell-size); height: 24px; display: flex; align-items: center; justify-content: center; }
@@ -183,12 +213,7 @@
   }
   .feedback.goal { color: var(--pitch-green); animation: goalCelebrate 0.6s ease-out; }
   .feedback.miss { color: var(--red); animation: shake 0.4s; }
-
-  @keyframes goalCelebrate {
-    0% { transform: scale(0.5); opacity: 0; }
-    50% { transform: scale(1.3); }
-    100% { transform: scale(1); opacity: 1; }
-  }
+  @keyframes goalCelebrate { 0%{transform:scale(0.5);opacity:0} 50%{transform:scale(1.3)} 100%{transform:scale(1);opacity:1} }
 
   .goal-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -201,20 +226,13 @@
     text-shadow: 4px 4px 0 var(--dark), 0 0 40px rgba(255,215,0,0.6);
     animation: goalZoom 1s ease-out;
   }
-  @keyframes goalZoom {
-    0% { transform: scale(0) rotate(-10deg); opacity: 0; }
-    60% { transform: scale(1.2) rotate(5deg); opacity: 1; }
-    100% { transform: scale(1) rotate(0deg); opacity: 1; }
-  }
+  @keyframes goalZoom { 0%{transform:scale(0) rotate(-10deg);opacity:0} 60%{transform:scale(1.2) rotate(5deg);opacity:1} 100%{transform:scale(1) rotate(0deg);opacity:1} }
 
   .ball-rain {
     position: fixed; top: -60px; font-size: 2rem;
     animation: fallDown 2s ease-in forwards; z-index: 99; pointer-events: none;
   }
-  @keyframes fallDown {
-    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
-  }
+  @keyframes fallDown { 0%{transform:translateY(0) rotate(0deg);opacity:1} 100%{transform:translateY(110vh) rotate(720deg);opacity:0} }
 
   .hint-box {
     background: #fff8e1; border: 2px solid var(--gold-dark); border-radius: 10px;
@@ -226,7 +244,7 @@
     color: var(--gold-dark); margin-bottom: 2px; letter-spacing: 1px;
   }
 
-  /* Borrow digit styling */
+  /* Borrow */
   .borrow-digit-cell {
     width: var(--cell-size); height: var(--cell-size);
     display: flex; align-items: center; justify-content: center;
@@ -235,7 +253,6 @@
   .borrow-digit-cell:hover { transform: scale(1.08); }
   .borrow-digit-cell.no-click { cursor: default; }
   .borrow-digit-cell.no-click:hover { transform: none; }
-
   .borrow-digit-main {
     font-family: 'Nunito', sans-serif; font-size: var(--cell-font);
     font-weight: 900; color: var(--dark); position: relative; z-index: 1;
@@ -245,48 +262,50 @@
     content: ''; position: absolute; top: 50%; left: -3px; right: -3px;
     height: 2.5px; background: var(--red); transform: rotate(-18deg);
   }
-
   .borrow-ten-marker {
     position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
     font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 900;
     color: var(--red); z-index: 3; line-height: 1; white-space: nowrap;
   }
+  .borrow-help-text { font-size: 0.7rem; color: #888; text-align: center; margin-bottom: 4px; font-weight: 700; }
 
-  .borrow-help-text {
-    font-size: 0.7rem; color: #888; text-align: center;
-    margin-bottom: 4px; font-weight: 700;
-  }
-
-  /* Match finished overlay */
+  /* Finished overlay */
   .match-finished-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.75); display: flex; align-items: center;
     justify-content: center; z-index: 200; backdrop-filter: blur(4px);
   }
   .match-finished-card {
-    background: var(--white); border-radius: 20px; padding: 32px 28px;
+    background: var(--white); border-radius: 20px; padding: 28px 24px;
     text-align: center; border: 4px solid var(--gold);
     box-shadow: 0 12px 48px rgba(0,0,0,0.5); max-width: 340px; width: 90%;
     animation: goalZoom 0.6s ease-out;
   }
   .match-finished-card h2 {
-    font-family: 'Bangers', cursive; font-size: 2.4rem; color: var(--pitch-dark);
-    letter-spacing: 2px; margin-bottom: 8px;
+    font-family: 'Bangers', cursive; font-size: 2rem; color: var(--pitch-dark);
+    letter-spacing: 2px; margin-bottom: 6px;
   }
-  .match-finished-card .trophy { font-size: 3.5rem; margin-bottom: 8px; }
+  .match-finished-card .trophy { font-size: 3rem; margin-bottom: 6px; }
   .match-finished-card .stats {
-    font-size: 1rem; font-weight: 800; color: var(--dark);
-    margin-bottom: 16px; line-height: 1.8;
+    font-size: 0.95rem; font-weight: 800; color: var(--dark);
+    margin-bottom: 14px; line-height: 1.8;
   }
-  .match-finished-card .stats span { color: var(--gold-dark); font-family: 'Bangers', cursive; font-size: 1.3rem; }
+  .match-finished-card .stats span { color: var(--gold-dark); font-family: 'Bangers', cursive; font-size: 1.2rem; }
   .btn-restart {
-    font-family: 'Bangers', cursive; font-size: 1.3rem; padding: 12px 36px;
+    font-family: 'Bangers', cursive; font-size: 1.2rem; padding: 12px 32px;
     border: none; border-radius: 50px; cursor: pointer;
     background: var(--pitch-green); color: var(--white);
     box-shadow: 0 4px 16px rgba(45,138,78,0.5); letter-spacing: 1px;
-    transition: all 0.2s;
+    transition: all 0.2s; margin: 4px;
   }
   .btn-restart:hover { transform: translateY(-2px); }
+  .btn-menu {
+    font-family: 'Bangers', cursive; font-size: 1rem; padding: 10px 24px;
+    border: 2px solid #ccc; border-radius: 50px; cursor: pointer;
+    background: var(--white); color: var(--dark);
+    letter-spacing: 1px; transition: all 0.2s; margin: 4px;
+  }
+  .btn-menu:hover { transform: translateY(-2px); border-color: var(--gold); }
 
   @media (max-width: 500px) {
     :root { --cell-size: 38px; --cell-font: 20px; }
@@ -295,12 +314,17 @@
     .goal-text { font-size: 3.5rem; }
     .scoreboard { gap: 10px; padding: 7px 10px; }
     .score-value { font-size: 1.3rem; }
+    .score-value.timer-val { font-size: 1.1rem; }
     .goal-dot { width: 10px; height: 10px; }
     .op-btn { font-size: 0.95rem; padding: 5px 12px; }
     .problem-card { padding: 12px 10px 10px; }
     .problem-question { font-size: 1.05rem; margin-bottom: 8px; }
     .btn { font-size: 0.95rem; padding: 7px 16px; }
     .borrow-ten-marker { font-size: 10px; }
+    .menu-card { padding: 22px 18px; margin-top: 14px; }
+    .menu-card h2 { font-size: 1.4rem; }
+    .mode-btn { font-size: 1.1rem; padding: 12px 16px; }
+    .btn-start { font-size: 1.2rem; padding: 12px 32px; }
   }
 </style>
 </head>
@@ -318,33 +342,120 @@ const { useState, useRef, useEffect, useCallback } = React;
 
 const MATCH_GOALS = 10;
 
-function randInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+function randInt(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
 
 function generateProblem(op) {
   let a, b;
-  if (op === '+') {
-    a = randInt(100, 9999); b = randInt(100, 9999);
-    return { a, b, op, answer: a + b };
-  } else if (op === '\u2212') {
-    a = randInt(200, 9999); b = randInt(100, a);
-    return { a, b, op, answer: a - b };
-  } else {
-    a = randInt(12, 999); b = randInt(12, 99);
-    return { a, b, op, answer: a * b };
-  }
+  if (op === '+') { a = randInt(100,9999); b = randInt(100,9999); return {a,b,op,answer:a+b}; }
+  else if (op === '\u2212') { a = randInt(200,9999); b = randInt(100,a); return {a,b,op,answer:a-b}; }
+  else { a = randInt(12,999); b = randInt(12,99); return {a,b,op,answer:a*b}; }
 }
 
 function digitsArr(n, len) {
-  const s = String(n);
-  const arr = s.split('').map(Number);
+  const arr = String(n).split('').map(Number);
   while (arr.length < len) arr.unshift(null);
   return arr;
 }
 
+function fmtTimer(sec) {
+  const m = Math.floor(sec / 60); const s = sec % 60;
+  return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+
+// ─── Sound effects (Web Audio API) ──────────────────────
+let audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playGoalSound() {
+  try {
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+
+    // Rising triumphant chord: C5, E5, G5 staggered
+    const freqs = [523, 659, 784];
+    freqs.forEach((f, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(f, now + i * 0.08);
+      gain.gain.setValueAtTime(0, now + i * 0.08);
+      gain.gain.linearRampToValueAtTime(0.18, now + i * 0.08 + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.6);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(now + i * 0.08);
+      osc.stop(now + i * 0.08 + 0.7);
+    });
+
+    // Crowd noise burst (white noise through bandpass)
+    const bufferSize = ctx.sampleRate * 0.8;
+    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    const noise = ctx.createBufferSource();
+    noise.buffer = noiseBuffer;
+    const bandpass = ctx.createBiquadFilter();
+    bandpass.type = 'bandpass';
+    bandpass.frequency.value = 1200;
+    bandpass.Q.value = 0.5;
+    const nGain = ctx.createGain();
+    nGain.gain.setValueAtTime(0, now);
+    nGain.gain.linearRampToValueAtTime(0.12, now + 0.05);
+    nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+    noise.connect(bandpass); bandpass.connect(nGain); nGain.connect(ctx.destination);
+    noise.start(now); noise.stop(now + 0.9);
+  } catch(e) {}
+}
+
+function playWhistleSound() {
+  try {
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+
+    // Three short whistle blasts like a referee
+    [0, 0.25, 0.5].forEach((offset) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(3200, now + offset);
+      osc.frequency.linearRampToValueAtTime(2800, now + offset + 0.15);
+      gain.gain.setValueAtTime(0, now + offset);
+      gain.gain.linearRampToValueAtTime(0.15, now + offset + 0.02);
+      gain.gain.setValueAtTime(0.15, now + offset + 0.1);
+      gain.gain.linearRampToValueAtTime(0, now + offset + 0.18);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(now + offset);
+      osc.stop(now + offset + 0.2);
+    });
+  } catch(e) {}
+}
+
+function playMissSound() {
+  try {
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    // Short descending tone
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(400, now);
+    osc.frequency.linearRampToValueAtTime(200, now + 0.25);
+    gain.gain.setValueAtTime(0.12, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(now); osc.stop(now + 0.35);
+  } catch(e) {}
+}
+
 // ─── Main App ───────────────────────────────────────────
 function App() {
+  const [screen, setScreen] = useState('menu'); // menu | playing | finished
+  const [mode, setMode] = useState('match');    // match | practice
+  const [practiceMins, setPracticeMins] = useState(5);
+  const [timeLeft, setTimeLeft] = useState(0);
+
   const [operation, setOperation] = useState('+');
   const [problem, setProblem] = useState(() => generateProblem('+'));
   const [score, setScore] = useState(0);
@@ -357,7 +468,27 @@ function App() {
   const [balls, setBalls] = useState([]);
   const [checked, setChecked] = useState(false);
   const [hint, setHint] = useState('');
-  const [matchFinished, setMatchFinished] = useState(false);
+
+  // Countdown timer for practice mode
+  useEffect(() => {
+    if (screen !== 'playing' || mode !== 'practice') return;
+    if (timeLeft <= 0) return;
+    const t = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) { clearInterval(t); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(t);
+  }, [screen, mode, timeLeft]);
+
+  // When timer hits 0 in practice mode, finish
+  useEffect(() => {
+    if (screen === 'playing' && mode === 'practice' && timeLeft === 0) {
+      playWhistleSound();
+      setTimeout(() => setScreen('finished'), 600);
+    }
+  }, [timeLeft, screen, mode]);
 
   const newProblem = useCallback((op) => {
     setProblem(generateProblem(op));
@@ -366,47 +497,111 @@ function App() {
 
   const switchOp = (op) => { setOperation(op); newProblem(op); };
 
+  const startGame = () => {
+    setScore(0); setStreak(0); setBestStreak(0); setAttempts(0);
+    setFeedback(''); setFeedbackType(''); setChecked(false); setHint('');
+    setProblem(generateProblem(operation));
+    if (mode === 'practice') setTimeLeft(practiceMins * 60);
+    setScreen('playing');
+  };
+
+  const goToMenu = () => { setScreen('menu'); };
+
   const celebrateGoal = (newScore) => {
+    playGoalSound();
     setShowGoal(true);
-    const nb = Array.from({ length: 12 }, (_, i) => ({ id: Date.now() + i, left: Math.random() * 100, delay: Math.random() * 0.8 }));
+    const nb = Array.from({length:12},(_,i)=>({id:Date.now()+i,left:Math.random()*100,delay:Math.random()*0.8}));
     setBalls(nb);
     setTimeout(() => {
       setShowGoal(false); setBalls([]);
-      if (newScore >= MATCH_GOALS) setMatchFinished(true);
+      if (mode === 'match' && newScore >= MATCH_GOALS) { playWhistleSound(); setScreen('finished'); }
     }, 2000);
   };
 
-  const restartMatch = () => {
-    setScore(0); setStreak(0); setBestStreak(0); setAttempts(0);
-    setMatchFinished(false); newProblem(operation);
-  };
-
   const handleCorrect = () => {
-    const newScore = score + 1;
-    const newStreak = streak + 1;
-    setScore(newScore);
-    setStreak(newStreak);
-    setBestStreak(b => Math.max(b, newStreak));
+    const ns = score + 1; const nst = streak + 1;
+    setScore(ns); setStreak(nst);
+    setBestStreak(b => Math.max(b, nst));
     setAttempts(a => a + 1);
-    celebrateGoal(newScore);
+    celebrateGoal(ns);
   };
 
-  const handleIncorrect = () => {
-    setStreak(0);
-    setAttempts(a => a + 1);
-  };
+  const handleIncorrect = () => { playMissSound(); setStreak(0); setAttempts(a => a + 1); };
 
+  // ─── Menu screen ───
+  if (screen === 'menu') {
+    return (
+      <>
+        <div className="header">
+          <h1>⚽ <span>MATTE</span>MATCHEN</h1>
+          <div className="subtitle">Träna matte och gör mål!</div>
+        </div>
+        <div className="menu-card">
+          <h2>Välj spelläge</h2>
+          <button className={`mode-btn ${mode==='match'?'selected':''}`} onClick={()=>setMode('match')}>
+            🏆 Match
+            <span className="mode-desc">Gör {MATCH_GOALS} mål för att vinna!</span>
+          </button>
+          <button className={`mode-btn ${mode==='practice'?'selected':''}`} onClick={()=>setMode('practice')}>
+            ⏱ Träning
+            <span className="mode-desc">Öva på tid — hur många mål hinner du?</span>
+          </button>
+
+          {mode === 'practice' && (
+            <div className="timer-picker">
+              <label>⏱ Tid:</label>
+              <select value={practiceMins} onChange={e => setPracticeMins(Number(e.target.value))}>
+                {[1,2,3,5,10,15,20].map(m => (
+                  <option key={m} value={m}>{m} min</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          <button className="btn-start" onClick={startGame}>⚽ Starta!</button>
+        </div>
+      </>
+    );
+  }
+
+  // ─── Finished screen ───
+  if (screen === 'finished') {
+    return (
+      <>
+        <div className="header">
+          <h1>⚽ <span>MATTE</span>MATCHEN</h1>
+        </div>
+        <div className="match-finished-overlay" style={{position:'relative', background:'transparent', backdropFilter:'none', minHeight:'60vh'}}>
+          <div className="match-finished-card">
+            <div className="trophy">{mode === 'match' ? '🏆' : '⏱'}</div>
+            <h2>{mode === 'match' ? 'Matchen är slut!' : 'Tiden är ute!'}</h2>
+            <div className="stats">
+              Du gjorde <span>{score} mål</span> på <span>{attempts} försök</span>!<br/>
+              Bästa svit: <span>🔥 {bestStreak}</span>
+            </div>
+            <button className="btn-restart" onClick={startGame}>
+              {mode === 'match' ? '⚽ Ny match!' : '⚽ Träna igen!'}
+            </button>
+            <br/>
+            <button className="btn-menu" onClick={goToMenu}>↩️ Tillbaka</button>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // ─── Playing screen ───
   return (
     <>
       <div className="header">
         <h1>⚽ <span>MATTE</span>MATCHEN</h1>
-        <div className="subtitle">Gör {MATCH_GOALS} mål för att vinna matchen!</div>
+        <div className="subtitle">{mode === 'match' ? `Gör ${MATCH_GOALS} mål för att vinna!` : 'Träningspass'}</div>
       </div>
 
       <div className="scoreboard">
         <div className="score-item">
           <div className="score-label">Mål</div>
-          <div className="score-value">{score}/{MATCH_GOALS}</div>
+          <div className="score-value">{mode === 'match' ? `${score}/${MATCH_GOALS}` : score}</div>
         </div>
         <div className="score-divider"></div>
         <div className="score-item">
@@ -419,19 +614,28 @@ function App() {
           <div className="score-value streak">🔥 {streak}</div>
         </div>
         <div className="score-divider"></div>
-        <div className="score-item">
-          <div className="goal-progress">
-            {Array.from({ length: MATCH_GOALS }, (_, i) => (
-              <div key={i} className={`goal-dot ${i < score ? 'scored' : ''}`}></div>
-            ))}
+        {mode === 'match' ? (
+          <div className="score-item">
+            <div className="goal-progress">
+              {Array.from({length:MATCH_GOALS},(_,i) => (
+                <div key={i} className={`goal-dot ${i<score?'scored':''}`}></div>
+              ))}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="score-item">
+            <div className="score-label">Tid</div>
+            <div className={`score-value timer-val ${timeLeft <= 30 ? 'urgent' : ''}`}>
+              ⏱ {fmtTimer(timeLeft)}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="op-selector">
-        {['+', '\u2212', '\u00d7'].map(op => (
-          <button key={op} className={`op-btn ${operation === op ? 'active' : ''}`} onClick={() => switchOp(op)}>
-            {op === '+' ? '➕ Plus' : op === '\u2212' ? '➖ Minus' : '✖️ Gånger'}
+        {['+','\u2212','\u00d7'].map(op => (
+          <button key={op} className={`op-btn ${operation===op?'active':''}`} onClick={()=>switchOp(op)}>
+            {op==='+'?'➕ Plus':op==='\u2212'?'➖ Minus':'✖️ Gånger'}
           </button>
         ))}
       </div>
@@ -446,43 +650,26 @@ function App() {
             setFeedback={setFeedback} setFeedbackType={setFeedbackType}
             onCorrect={handleCorrect} onIncorrect={handleIncorrect} />
         )}
-
         <div className="btn-row">
           {!checked && (
             <button className="btn btn-hint" onClick={() => {
-              if (operation === '\u00d7') setHint('Multiplicera med en siffra i taget! Börja med entalen. Minnessiffra när produkten blir 10 eller mer.');
-              else if (operation === '\u2212') setHint('Börja från höger. Om övre siffran är mindre, klicka på den för att låna! Siffran till vänster stryks och du får +10.');
+              if (operation==='\u00d7') setHint('Multiplicera med en siffra i taget! Börja med entalen. Minnessiffra när produkten blir 10 eller mer.');
+              else if (operation==='\u2212') setHint('Börja från höger. Om övre siffran är mindre, klicka på den för att låna! Siffran till vänster stryks och du får +10.');
               else setHint('Börja från höger. Addera siffrorna plus minnessiffra. Om summan blir 10+, skriv entalet och för över minnessiffran.');
             }}>💡 Tips</button>
           )}
           <button className="btn btn-new" onClick={() => newProblem(operation)}>⚽ Nytt tal</button>
         </div>
-
         {feedback && <div className={`feedback ${feedbackType}`}>{feedback}</div>}
         {hint && <div className="hint-box"><div className="hint-title">💡 Tränarens tips</div>{hint}</div>}
       </div>
 
-      <div className={`goal-overlay ${showGoal ? 'show' : ''}`}>
+      <div className={`goal-overlay ${showGoal?'show':''}`}>
         {showGoal && <div className="goal-text">⚽ MÅÅÅL!!</div>}
       </div>
       {balls.map(b => (
-        <div key={b.id} className="ball-rain" style={{ left: b.left + '%', animationDelay: b.delay + 's' }}>⚽</div>
+        <div key={b.id} className="ball-rain" style={{left:b.left+'%',animationDelay:b.delay+'s'}}>⚽</div>
       ))}
-
-      {/* Match finished overlay */}
-      {matchFinished && (
-        <div className="match-finished-overlay">
-          <div className="match-finished-card">
-            <div className="trophy">🏆</div>
-            <h2>Matchen är slut!</h2>
-            <div className="stats">
-              Du gjorde <span>{MATCH_GOALS} mål</span> på <span>{attempts} försök</span>!<br/>
-              Bästa svit: <span>🔥 {bestStreak}</span>
-            </div>
-            <button className="btn-restart" onClick={restartMatch}>⚽ Ny match!</button>
-          </div>
-        </div>
-      )}
     </>
   );
 }
@@ -491,161 +678,117 @@ function App() {
 // ─── Addition / Subtraction Workspace ───────────────────
 function AddSubWorkspace({ problem, checked, setChecked, setFeedback, setFeedbackType, onCorrect, onIncorrect }) {
   const { a, b, op, answer } = problem;
-  const isSubtraction = (op === '\u2212');
-  const ansStr = String(answer);
-  const maxLen = Math.max(String(a).length, String(b).length, ansStr.length);
+  const isSub = (op === '\u2212');
+  const maxLen = Math.max(String(a).length, String(b).length, String(answer).length);
   const totalCols = maxLen + 1;
+  const aOrig = digitsArr(a, totalCols);
+  const bDig = digitsArr(b, totalCols);
+  const ansDig = digitsArr(answer, totalCols);
 
-  const aDigitsOrig = digitsArr(a, totalCols);
-  const bDigits = digitsArr(b, totalCols);
-  const ansDigits = digitsArr(answer, totalCols);
-
-  const [answerInputs, setAnswerInputs] = useState({});
-  const [carryInputs, setCarryInputs] = useState({});
-  const [cellStatus, setCellStatus] = useState({});
-  const [borrowGiven, setBorrowGiven] = useState({});
-  const [borrowReceived, setBorrowReceived] = useState({});
-  const inputRefs = useRef({});
+  const [ansIn, setAnsIn] = useState({});
+  const [carryIn, setCarryIn] = useState({});
+  const [status, setStatus] = useState({});
+  const [bGiven, setBGiven] = useState({});
+  const [bRecv, setBRecv] = useState({});
+  const refs = useRef({});
 
   useEffect(() => {
-    setAnswerInputs({}); setCarryInputs({}); setCellStatus({});
-    setBorrowGiven({}); setBorrowReceived({});
-    inputRefs.current = {};
+    setAnsIn({}); setCarryIn({}); setStatus({}); setBGiven({}); setBRecv({}); refs.current = {};
   }, [problem]);
 
-  const getEffectiveDigit = (col) => {
-    const orig = aDigitsOrig[col];
-    if (orig === null) return null;
-    return orig - (borrowGiven[col] || 0) + (borrowReceived[col] || 0) * 10;
+  const effDig = (c) => {
+    const o = aOrig[c]; if (o===null) return null;
+    return o - (bGiven[c]||0) + (bRecv[c]||0)*10;
   };
 
-  const handleBorrow = (col) => {
-    if (checked || !isSubtraction) return;
-    const leftCol = col - 1;
-    if (leftCol < 0) return;
-    const leftEffective = getEffectiveDigit(leftCol);
-    if (leftEffective === null || leftEffective <= 0) return;
-    setBorrowGiven(prev => ({ ...prev, [leftCol]: (prev[leftCol] || 0) + 1 }));
-    setBorrowReceived(prev => ({ ...prev, [col]: (prev[col] || 0) + 1 }));
+  const doBorrow = (c) => {
+    if (checked || !isSub || c < 1) return;
+    const le = effDig(c-1); if (le===null||le<=0) return;
+    setBGiven(p=>({...p,[c-1]:(p[c-1]||0)+1}));
+    setBRecv(p=>({...p,[c]:(p[c]||0)+1}));
   };
 
-  const handleUndoBorrows = () => { setBorrowGiven({}); setBorrowReceived({}); };
+  const onAns = (c,v) => {
+    if (v.length>1) v=v.slice(-1); if (v&&!/^\d$/.test(v)) return;
+    setAnsIn(p=>({...p,[c]:v}));
+    if (v&&c>0) { const r=refs.current['a-'+(c-1)]; if(r) setTimeout(()=>r.focus(),50); }
+  };
+  const onCarry = (c,v) => {
+    if (v.length>1) v=v.slice(-1); if (v&&!/^\d$/.test(v)) return;
+    setCarryIn(p=>({...p,[c]:v}));
+  };
 
-  const handleAnswerChange = (col, val) => {
-    if (val.length > 1) val = val.slice(-1);
-    if (val && !/^\d$/.test(val)) return;
-    setAnswerInputs(prev => ({ ...prev, [col]: val }));
-    if (val && col > 0) {
-      const r = inputRefs.current['ans-'+(col-1)];
-      if (r) setTimeout(() => r.focus(), 50);
+  const doCheck = () => {
+    let ed=[]; for(let c=0;c<totalCols;c++) ed.push(ansIn[c]||'');
+    const es = ed.join('').replace(/^0+/,'')||'0';
+    const ns = {};
+    for(let c=0;c<totalCols;c++){
+      const ex=ansDig[c], en=ansIn[c]||'';
+      if(ex===null&&en===''){}
+      else if(String(ex)===en) ns[c]='correct';
+      else ns[c]='incorrect';
     }
-  };
-
-  const handleCarryChange = (col, val) => {
-    if (val.length > 1) val = val.slice(-1);
-    if (val && !/^\d$/.test(val)) return;
-    setCarryInputs(prev => ({ ...prev, [col]: val }));
-  };
-
-  const handleCheck = () => {
-    let enteredDigits = [];
-    for (let c = 0; c < totalCols; c++) enteredDigits.push(answerInputs[c] || '');
-    const enteredStr = enteredDigits.join('').replace(/^0+/, '') || '0';
-
-    const newStatus = {};
-    for (let c = 0; c < totalCols; c++) {
-      const expected = ansDigits[c]; const entered = answerInputs[c] || '';
-      if (expected === null && entered === '') {}
-      else if (String(expected) === entered) newStatus[c] = 'correct';
-      else newStatus[c] = 'incorrect';
-    }
-    setCellStatus(newStatus); setChecked(true);
-
-    if (enteredStr === String(answer)) {
+    setStatus(ns); setChecked(true);
+    if(es===String(answer)){
       setFeedback('⚽ MÅÅÅL! Snyggt jobbat!'); setFeedbackType('goal'); onCorrect();
     } else {
       setFeedback(`Inte riktigt! Svaret är ${answer}.`); setFeedbackType('miss'); onIncorrect();
     }
   };
 
-  const sepWidth = totalCols * parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cell-size')) + parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cell-size'));
-  const hasBorrows = Object.keys(borrowGiven).length > 0;
+  const hasBorrow = Object.keys(bGiven).length>0;
 
   return (
     <div className="workspace">
       <div className="problem-question">Vad är {a} {op} {b}?</div>
-
-      {!isSubtraction && (
+      {!isSub && (
         <div className="carry-row">
-          <div className="carry-cell" style={{ width: 'var(--cell-size)' }}></div>
-          {Array.from({ length: totalCols }, (_, c) => (
-            <div className="carry-cell" key={'carry-'+c}>
-              <input className={`carry-input ${carryInputs[c] ? 'has-value' : ''}`}
+          <div className="carry-cell" style={{width:'var(--cell-size)'}}></div>
+          {Array.from({length:totalCols},(_,c)=>(
+            <div className="carry-cell" key={'c-'+c}>
+              <input className={`carry-input ${carryIn[c]?'has-value':''}`}
                 type="text" inputMode="numeric" maxLength={1}
-                value={carryInputs[c] || ''} onChange={e => handleCarryChange(c, e.target.value)}
-                disabled={checked} />
+                value={carryIn[c]||''} onChange={e=>onCarry(c,e.target.value)} disabled={checked}/>
             </div>
           ))}
         </div>
       )}
-
-      {isSubtraction && !checked && (
-        <div className="borrow-help-text">👆 Klicka på en siffra för att låna</div>
-      )}
-
+      {isSub && !checked && <div className="borrow-help-text">👆 Klicka på en siffra för att låna</div>}
       <div className="grid-row">
         <div className="op-symbol"></div>
-        {aDigitsOrig.map((origD, c) => {
-          if (!isSubtraction) {
-            return <div className="cell cell-digit" key={'a-'+c}>{origD !== null ? origD : ''}</div>;
-          }
-          const given = borrowGiven[c] || 0;
-          const received = borrowReceived[c] || 0;
-          const hasGiven = given > 0;
-          const hasReceived = received > 0;
-          const canBorrow = !checked && origD !== null && c > 0;
-
+        {aOrig.map((d,c)=>{
+          if(!isSub) return <div className="cell cell-digit" key={'a-'+c}>{d!==null?d:''}</div>;
+          const gv=bGiven[c]||0, rv=bRecv[c]||0;
+          const canB=!checked&&d!==null&&c>0;
           return (
-            <div className={`borrow-digit-cell ${(!canBorrow || checked) ? 'no-click' : ''}`}
-              key={'a-'+c} onClick={() => canBorrow && handleBorrow(c)}
-              title={canBorrow ? 'Klicka för att låna' : ''}>
-              {hasReceived && <span className="borrow-ten-marker">10</span>}
-              <span className={`borrow-digit-main ${hasGiven ? 'crossed-out' : ''}`}>
-                {origD !== null ? origD : ''}
-              </span>
+            <div className={`borrow-digit-cell ${(!canB||checked)?'no-click':''}`} key={'a-'+c}
+              onClick={()=>canB&&doBorrow(c)}>
+              {rv>0&&<span className="borrow-ten-marker">10</span>}
+              <span className={`borrow-digit-main ${gv>0?'crossed-out':''}`}>{d!==null?d:''}</span>
             </div>
           );
         })}
       </div>
-
       <div className="grid-row">
         <div className="op-symbol">{op}</div>
-        {bDigits.map((d, c) => (
-          <div className="cell cell-digit" key={'b-'+c}>{d !== null ? d : ''}</div>
-        ))}
+        {bDig.map((d,c)=><div className="cell cell-digit" key={'b-'+c}>{d!==null?d:''}</div>)}
       </div>
-
-      <div className="separator"><div className="sep-line" style={{ width: 'calc(var(--cell-size) * ' + (totalCols + 1) + ')' }}></div></div>
-
+      <div className="separator"><div className="sep-line" style={{width:'calc(var(--cell-size) * '+(totalCols+1)+')'}}></div></div>
       <div className="grid-row">
         <div className="op-symbol"></div>
-        {Array.from({ length: totalCols }, (_, c) => (
-          <div className="cell" key={'ans-'+c}>
-            <input ref={el => inputRefs.current['ans-'+c] = el}
-              className={`cell-input ${cellStatus[c] || ''}`}
+        {Array.from({length:totalCols},(_,c)=>(
+          <div className="cell" key={'r-'+c}>
+            <input ref={el=>refs.current['a-'+c]=el}
+              className={`cell-input ${status[c]||''}`}
               type="text" inputMode="numeric" maxLength={1}
-              value={answerInputs[c] || ''} onChange={e => handleAnswerChange(c, e.target.value)}
-              disabled={checked} />
+              value={ansIn[c]||''} onChange={e=>onAns(c,e.target.value)} disabled={checked}/>
           </div>
         ))}
       </div>
-
-      {!checked && (
-        <div className="btn-row" style={{ marginTop: 10 }}>
-          <button className="btn btn-check" onClick={handleCheck}>✅ Kolla svar</button>
-          {isSubtraction && hasBorrows && (
-            <button className="btn btn-undo" onClick={handleUndoBorrows}>↩️ Ångra</button>
-          )}
+      {!checked&&(
+        <div className="btn-row" style={{marginTop:10}}>
+          <button className="btn btn-check" onClick={doCheck}>✅ Kolla svar</button>
+          {isSub&&hasBorrow&&<button className="btn btn-undo" onClick={()=>{setBGiven({});setBRecv({});}}>↩️ Ångra</button>}
         </div>
       )}
     </div>
@@ -655,198 +798,157 @@ function AddSubWorkspace({ problem, checked, setChecked, setFeedback, setFeedbac
 
 // ─── Multiplication Workspace ───────────────────────────
 function MultiplicationWorkspace({ problem, checked, setChecked, setFeedback, setFeedbackType, onCorrect, onIncorrect }) {
-  const { a, b, op, answer } = problem;
+  const { a, b, answer } = problem;
+  const bDA = String(b).split('').map(Number);
+  const pp = bDA.map((d,i)=>a*d*Math.pow(10,bDA.length-1-i));
+  const mpLen = Math.max(...pp.map(p=>String(p).length));
+  const maxLen = Math.max(String(a).length, String(b).length, String(answer).length, mpLen);
+  const tc = maxLen+1;
+  const aD = digitsArr(a,tc), bP = digitsArr(b,tc);
 
-  const bStr = String(b); const aStr = String(a);
-  const bDigitsArr = bStr.split('').map(Number);
-  const partialProducts = bDigitsArr.map((d, i) => {
-    const posFromRight = bDigitsArr.length - 1 - i;
-    return a * d * Math.pow(10, posFromRight);
-  });
+  const [pIn,setPIn]=useState({}); const [fIn,setFIn]=useState({});
+  const [cIn,setCIn]=useState({}); const [st,setSt]=useState({});
+  const refs=useRef({});
 
-  const ansStr = String(answer);
-  const maxPartialLen = Math.max(...partialProducts.map(p => String(p).length));
-  const maxLen = Math.max(aStr.length, bStr.length, ansStr.length, maxPartialLen);
-  const totalCols = maxLen + 1;
+  useEffect(()=>{ setPIn({}); setFIn({}); setCIn({}); setSt({}); refs.current={}; },[problem]);
 
-  const aDigits = digitsArr(a, totalCols);
-  const bDigitsPadded = digitsArr(b, totalCols);
-
-  const [partialInputs, setPartialInputs] = useState({});
-  const [finalInputs, setFinalInputs] = useState({});
-  const [carryInputs, setCarryInputs] = useState({});
-  const [cellStatus, setCellStatus] = useState({});
-  const inputRefs = useRef({});
-
-  useEffect(() => {
-    setPartialInputs({}); setFinalInputs({}); setCarryInputs({}); setCellStatus({});
-    inputRefs.current = {};
-  }, [problem]);
-
-  const handlePartialChange = (row, col, val) => {
-    if (val.length > 1) val = val.slice(-1);
-    if (val && !/^\d$/.test(val)) return;
-    setPartialInputs(prev => ({ ...prev, [row+'-'+col]: val }));
-    if (val && col > 0) {
-      const r = inputRefs.current['p-'+row+'-'+(col-1)];
-      if (r) setTimeout(() => r.focus(), 50);
-    }
+  const onP=(r,c,v)=>{
+    if(v.length>1)v=v.slice(-1); if(v&&!/^\d$/.test(v))return;
+    setPIn(p=>({...p,[r+'-'+c]:v}));
+    if(v&&c>0){const x=refs.current['p-'+r+'-'+(c-1)];if(x)setTimeout(()=>x.focus(),50);}
+  };
+  const onF=(c,v)=>{
+    if(v.length>1)v=v.slice(-1); if(v&&!/^\d$/.test(v))return;
+    setFIn(p=>({...p,[c]:v}));
+    if(v&&c>0){const x=refs.current['f-'+(c-1)];if(x)setTimeout(()=>x.focus(),50);}
+  };
+  const onC=(r,c,v)=>{
+    if(v.length>1)v=v.slice(-1); if(v&&!/^\d$/.test(v))return;
+    setCIn(p=>({...p,['c-'+r+'-'+c]:v}));
   };
 
-  const handleFinalChange = (col, val) => {
-    if (val.length > 1) val = val.slice(-1);
-    if (val && !/^\d$/.test(val)) return;
-    setFinalInputs(prev => ({ ...prev, [col]: val }));
-    if (val && col > 0) {
-      const r = inputRefs.current['f-'+(col-1)];
-      if (r) setTimeout(() => r.focus(), 50);
+  const doCheck=(fi)=>{
+    const aD2=digitsArr(answer,tc);
+    let ed=[]; for(let c=0;c<tc;c++) ed.push(fi[c]||'');
+    const es=ed.join('').replace(/^0+/,'')||'0';
+    const ns={};
+    for(let c=0;c<tc;c++){
+      const ex=aD2[c],en=fi[c]||'';
+      if(ex===null&&en===''){}
+      else if(String(ex)===en) ns['f-'+c]='correct';
+      else ns['f-'+c]='incorrect';
     }
-  };
-
-  const handleCarryChange = (row, col, val) => {
-    if (val.length > 1) val = val.slice(-1);
-    if (val && !/^\d$/.test(val)) return;
-    setCarryInputs(prev => ({ ...prev, ['c-'+row+'-'+col]: val }));
-  };
-
-  const checkFinal = (fInputs) => {
-    const ansD = digitsArr(answer, totalCols);
-    let entered = [];
-    for (let c = 0; c < totalCols; c++) entered.push(fInputs[c] || '');
-    const enteredStr = entered.join('').replace(/^0+/, '') || '0';
-
-    const newStatus = {};
-    for (let c = 0; c < totalCols; c++) {
-      const expected = ansD[c]; const ent = fInputs[c] || '';
-      if (expected === null && ent === '') {}
-      else if (String(expected) === ent) newStatus['f-'+c] = 'correct';
-      else newStatus['f-'+c] = 'incorrect';
-    }
-
-    partialProducts.forEach((pp, row) => {
-      const ppD = digitsArr(pp, totalCols);
-      for (let c = 0; c < totalCols; c++) {
-        const expected = ppD[c]; const ent = partialInputs[row+'-'+c] || '';
-        if (expected === null && ent === '') {}
-        else if (String(expected) === ent) newStatus['p-'+row+'-'+c] = 'correct';
-        else if (ent !== '') newStatus['p-'+row+'-'+c] = 'incorrect';
+    pp.forEach((v,r)=>{
+      const pd=digitsArr(v,tc);
+      for(let c=0;c<tc;c++){
+        const ex=pd[c],en=pIn[r+'-'+c]||'';
+        if(ex===null&&en===''){}
+        else if(String(ex)===en) ns['p-'+r+'-'+c]='correct';
+        else if(en!=='') ns['p-'+r+'-'+c]='incorrect';
       }
     });
-
-    setCellStatus(newStatus); setChecked(true);
-
-    if (enteredStr === String(answer)) {
+    setSt(ns); setChecked(true);
+    if(es===String(answer)){
       setFeedback('⚽ MÅÅÅL! Briljant!'); setFeedbackType('goal'); onCorrect();
     } else {
       setFeedback(`Nästan! Svaret är ${answer}.`); setFeedbackType('miss'); onIncorrect();
     }
   };
 
-  const handleCheck = () => {
-    if (partialProducts.length === 1) {
-      const fInputs = {};
-      for (let c = 0; c < totalCols; c++) fInputs[c] = partialInputs['0-'+c] || '';
-      setFinalInputs(fInputs);
-      const ansD = digitsArr(answer, totalCols);
-      let entered = [];
-      for (let c = 0; c < totalCols; c++) entered.push(fInputs[c] || '');
-      const enteredStr = entered.join('').replace(/^0+/, '') || '0';
-      const newStatus = {};
-      for (let c = 0; c < totalCols; c++) {
-        const expected = ansD[c]; const ent = fInputs[c] || '';
-        if (expected === null && ent === '') {}
-        else if (String(expected) === ent) newStatus['p-0-'+c] = 'correct';
-        else newStatus['p-0-'+c] = 'incorrect';
+  const handleCheck=()=>{
+    if(pp.length===1){
+      const fi={}; for(let c=0;c<tc;c++) fi[c]=pIn['0-'+c]||'';
+      setFIn(fi);
+      const aD2=digitsArr(answer,tc);
+      let ed=[]; for(let c=0;c<tc;c++) ed.push(fi[c]||'');
+      const es=ed.join('').replace(/^0+/,'')||'0';
+      const ns={};
+      for(let c=0;c<tc;c++){
+        const ex=aD2[c],en=fi[c]||'';
+        if(ex===null&&en===''){}
+        else if(String(ex)===en) ns['p-0-'+c]='correct';
+        else ns['p-0-'+c]='incorrect';
       }
-      setCellStatus(newStatus); setChecked(true);
-      if (enteredStr === String(answer)) {
+      setSt(ns); setChecked(true);
+      if(es===String(answer)){
         setFeedback('⚽ MÅÅÅL! Briljant!'); setFeedbackType('goal'); onCorrect();
       } else {
         setFeedback(`Nästan! Svaret är ${answer}.`); setFeedbackType('miss'); onIncorrect();
       }
-    } else {
-      checkFinal(finalInputs);
-    }
+    } else doCheck(fIn);
   };
 
   return (
     <div className="workspace">
       <div className="problem-question">Vad är {a} × {b}?</div>
-
       <div className="carry-row">
-        <div className="carry-cell" style={{ width: 'var(--cell-size)' }}></div>
-        {Array.from({ length: totalCols }, (_, c) => (
+        <div className="carry-cell" style={{width:'var(--cell-size)'}}></div>
+        {Array.from({length:tc},(_,c)=>(
           <div className="carry-cell" key={'ct-'+c}>
-            <input className={`carry-input ${carryInputs['c-top-'+c] ? 'has-value' : ''}`}
+            <input className={`carry-input ${cIn['c-top-'+c]?'has-value':''}`}
               type="text" inputMode="numeric" maxLength={1}
-              value={carryInputs['c-top-'+c] || ''} onChange={e => handleCarryChange('top', c, e.target.value)} disabled={checked} />
+              value={cIn['c-top-'+c]||''} onChange={e=>onC('top',c,e.target.value)} disabled={checked}/>
           </div>
         ))}
       </div>
-
       <div className="grid-row">
         <div className="op-symbol"></div>
-        {aDigits.map((d,c) => <div className="cell cell-digit" key={'a-'+c}>{d !== null ? d : ''}</div>)}
+        {aD.map((d,c)=><div className="cell cell-digit" key={'a-'+c}>{d!==null?d:''}</div>)}
       </div>
-
       <div className="grid-row">
         <div className="op-symbol">×</div>
-        {bDigitsPadded.map((d,c) => <div className="cell cell-digit" key={'b-'+c}>{d !== null ? d : ''}</div>)}
+        {bP.map((d,c)=><div className="cell cell-digit" key={'b-'+c}>{d!==null?d:''}</div>)}
       </div>
+      <div className="separator"><div className="sep-line" style={{width:'calc(var(--cell-size) * '+(tc+1)+')'}}></div></div>
 
-      <div className="separator"><div className="sep-line" style={{ width: 'calc(var(--cell-size) * ' + (totalCols + 1) + ')' }}></div></div>
-
-      {/* Carry row for adding partial products (replaces DELPRODUKTER label) */}
-      {partialProducts.length > 1 && (
+      {pp.length>1&&(
         <div className="carry-row">
-          <div className="carry-cell" style={{ width: 'var(--cell-size)' }}></div>
-          {Array.from({ length: totalCols }, (_, c) => (
-            <div className="carry-cell" key={'cp-'+c}>
-              <input className={`carry-input ${carryInputs['c-sum-'+c] ? 'has-value' : ''}`}
+          <div className="carry-cell" style={{width:'var(--cell-size)'}}></div>
+          {Array.from({length:tc},(_,c)=>(
+            <div className="carry-cell" key={'cs-'+c}>
+              <input className={`carry-input ${cIn['c-sum-'+c]?'has-value':''}`}
                 type="text" inputMode="numeric" maxLength={1}
-                value={carryInputs['c-sum-'+c] || ''} onChange={e => handleCarryChange('sum', c, e.target.value)} disabled={checked} />
+                value={cIn['c-sum-'+c]||''} onChange={e=>onC('sum',c,e.target.value)} disabled={checked}/>
             </div>
           ))}
         </div>
       )}
 
-      {partialProducts.map((pp, row) => (
-        <React.Fragment key={'pp-'+row}>
-          <div className="grid-row">
-            <div className="op-symbol" style={{ fontSize: '0.9rem', color: '#999' }}>
-              {partialProducts.length > 1 ? (row === 0 ? '' : '+') : ''}
-            </div>
-            {Array.from({ length: totalCols }, (_, c) => (
-              <div className="cell" key={'p-'+row+'-'+c}>
-                <input ref={el => inputRefs.current['p-'+row+'-'+c] = el}
-                  className={`cell-input ${cellStatus['p-'+row+'-'+c] || ''}`}
-                  type="text" inputMode="numeric" maxLength={1}
-                  value={partialInputs[row+'-'+c] || ''} onChange={e => handlePartialChange(row, c, e.target.value)} disabled={checked} />
-              </div>
-            ))}
+      {pp.map((v,r)=>(
+        <div className="grid-row" key={'pp-'+r}>
+          <div className="op-symbol" style={{fontSize:'0.9rem',color:'#999'}}>
+            {pp.length>1?(r===0?'':'+'):''}
           </div>
-        </React.Fragment>
+          {Array.from({length:tc},(_,c)=>(
+            <div className="cell" key={'p-'+r+'-'+c}>
+              <input ref={el=>refs.current['p-'+r+'-'+c]=el}
+                className={`cell-input ${st['p-'+r+'-'+c]||''}`}
+                type="text" inputMode="numeric" maxLength={1}
+                value={pIn[r+'-'+c]||''} onChange={e=>onP(r,c,e.target.value)} disabled={checked}/>
+            </div>
+          ))}
+        </div>
       ))}
 
-      {partialProducts.length > 1 && (
+      {pp.length>1&&(
         <>
-          <div className="separator" style={{ marginTop: 4 }}><div className="sep-line" style={{ width: 'calc(var(--cell-size) * ' + (totalCols + 1) + ')' }}></div></div>
+          <div className="separator" style={{marginTop:4}}><div className="sep-line" style={{width:'calc(var(--cell-size) * '+(tc+1)+')'}}></div></div>
           <div className="grid-row">
             <div className="op-symbol">=</div>
-            {Array.from({ length: totalCols }, (_, c) => (
+            {Array.from({length:tc},(_,c)=>(
               <div className="cell" key={'f-'+c}>
-                <input ref={el => inputRefs.current['f-'+c] = el}
-                  className={`cell-input ${cellStatus['f-'+c] || ''}`}
+                <input ref={el=>refs.current['f-'+c]=el}
+                  className={`cell-input ${st['f-'+c]||''}`}
                   type="text" inputMode="numeric" maxLength={1}
-                  value={finalInputs[c] || ''} onChange={e => handleFinalChange(c, e.target.value)} disabled={checked} />
+                  value={fIn[c]||''} onChange={e=>onF(c,e.target.value)} disabled={checked}/>
               </div>
             ))}
           </div>
         </>
       )}
 
-      {!checked && (
-        <div className="btn-row" style={{ marginTop: 10 }}>
+      {!checked&&(
+        <div className="btn-row" style={{marginTop:10}}>
           <button className="btn btn-check" onClick={handleCheck}>✅ Kolla svar</button>
         </div>
       )}
