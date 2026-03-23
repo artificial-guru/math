@@ -269,6 +269,39 @@
   }
   .borrow-help-text { font-size: 0.7rem; color: #888; text-align: center; margin-bottom: 4px; font-weight: 700; }
 
+  /* Square root visual */
+  .sqrt-display {
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 16px; gap: 0;
+  }
+  .sqrt-symbol {
+    font-size: 3.2rem; font-weight: 400; color: var(--dark);
+    line-height: 1; display: flex; align-items: flex-end;
+    position: relative; padding-right: 2px;
+  }
+  .sqrt-radicand-wrap {
+    position: relative; display: inline-flex; align-items: center;
+    padding: 4px 10px 4px 4px;
+  }
+  .sqrt-radicand-wrap::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 3px; background: var(--dark); border-radius: 1px;
+  }
+  .sqrt-radicand {
+    font-family: 'Bangers', cursive; font-size: 2.4rem;
+    color: var(--dark); letter-spacing: 2px; line-height: 1.1;
+  }
+  .sqrt-equals { font-family: 'Bangers', cursive; font-size: 2rem; color: var(--dark); margin: 0 10px; }
+  .sqrt-input {
+    width: 64px; height: 56px; border: 3px solid #ccc; border-radius: 12px;
+    text-align: center; font-family: 'Bangers', cursive; font-size: 2rem;
+    color: var(--dark); background: #f9f9f9; outline: none;
+    transition: all 0.2s; padding: 0;
+  }
+  .sqrt-input:focus { border-color: var(--pitch-green); box-shadow: 0 0 0 4px rgba(45,138,78,0.2); background: #fff; }
+  .sqrt-input.correct { border-color: var(--pitch-green); background: #e8f5e9; color: var(--pitch-dark); }
+  .sqrt-input.incorrect { border-color: var(--red); background: #ffeaea; color: var(--red); animation: shake 0.4s; }
+
   /* Finished overlay */
   .match-finished-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -316,7 +349,8 @@
     .score-value { font-size: 1.3rem; }
     .score-value.timer-val { font-size: 1.1rem; }
     .goal-dot { width: 10px; height: 10px; }
-    .op-btn { font-size: 0.95rem; padding: 5px 12px; }
+    .op-selector { gap: 4px; }
+    .op-btn { font-size: 0.85rem; padding: 5px 9px; letter-spacing: 0.5px; }
     .problem-card { padding: 12px 10px 10px; }
     .problem-question { font-size: 1.05rem; margin-bottom: 8px; }
     .btn { font-size: 0.95rem; padding: 7px 16px; }
@@ -325,6 +359,10 @@
     .menu-card h2 { font-size: 1.4rem; }
     .mode-btn { font-size: 1.1rem; padding: 12px 16px; }
     .btn-start { font-size: 1.2rem; padding: 12px 32px; }
+    .sqrt-symbol { font-size: 2.6rem; }
+    .sqrt-radicand { font-size: 2rem; }
+    .sqrt-equals { font-size: 1.6rem; margin: 0 8px; }
+    .sqrt-input { width: 54px; height: 48px; font-size: 1.7rem; }
   }
 </style>
 </head>
@@ -350,7 +388,8 @@ function generateProblem(op) {
   const pick = () => Math.random() < 0.7 ? randInt(100,999) : randInt(1000,9999);
   if (op === '+') { a = pick(); b = pick(); return {a,b,op,answer:a+b}; }
   else if (op === '\u2212') { a = pick(); b = randInt(100, a); return {a,b,op,answer:a-b}; }
-  else { a = randInt(12,999); b = randInt(12,99); return {a,b,op,answer:a*b}; }
+  else if (op === '\u00d7') { a = randInt(12,999); b = randInt(12,99); return {a,b,op,answer:a*b}; }
+  else { /* √ */ b = randInt(1,10); a = b * b; return {a,b:null,op,answer:b}; }
 }
 
 function digitsArr(n, len) {
@@ -635,9 +674,9 @@ function App() {
       </div>
 
       <div className="op-selector">
-        {['+','\u2212','\u00d7'].map(op => (
+        {['+','\u2212','\u00d7','\u221a'].map(op => (
           <button key={op} className={`op-btn ${operation===op?'active':''}`} onClick={()=>switchOp(op)}>
-            {op==='+'?'➕ Plus':op==='\u2212'?'➖ Minus':'✖️ Gånger'}
+            {op==='+'?'➕ Plus':op==='\u2212'?'➖ Minus':op==='\u00d7'?'✖️ Gånger':'√ Roten'}
           </button>
         ))}
       </div>
@@ -645,6 +684,10 @@ function App() {
       <div className="problem-card">
         {operation === '\u00d7' ? (
           <MultiplicationWorkspace problem={problem} checked={checked} setChecked={setChecked}
+            setFeedback={setFeedback} setFeedbackType={setFeedbackType}
+            onCorrect={handleCorrect} onIncorrect={handleIncorrect} />
+        ) : operation === '\u221a' ? (
+          <SqrtWorkspace problem={problem} checked={checked} setChecked={setChecked}
             setFeedback={setFeedback} setFeedbackType={setFeedbackType}
             onCorrect={handleCorrect} onIncorrect={handleIncorrect} />
         ) : (
@@ -657,6 +700,7 @@ function App() {
             <button className="btn btn-hint" onClick={() => {
               if (operation==='\u00d7') setHint('Multiplicera med en siffra i taget! Börja med entalen. Minnessiffra när produkten blir 10 eller mer.');
               else if (operation==='\u2212') setHint('Börja från höger. Om övre siffran är mindre, klicka på den för att låna! Siffran till vänster stryks och du får +10.');
+              else if (operation==='\u221a') setHint('Vilket tal multiplicerat med sig självt ger talet under rottecknet? T.ex. √25 = 5 eftersom 5 × 5 = 25.');
               else setHint('Börja från höger. Addera siffrorna plus minnessiffra. Om summan blir 10+, skriv entalet och för över minnessiffran.');
             }}>💡 Tips</button>
           )}
@@ -952,6 +996,70 @@ function MultiplicationWorkspace({ problem, checked, setChecked, setFeedback, se
       {!checked&&(
         <div className="btn-row" style={{marginTop:10}}>
           <button className="btn btn-check" onClick={handleCheck}>✅ Kolla svar</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Square Root Workspace ──────────────────────────────
+function SqrtWorkspace({ problem, checked, setChecked, setFeedback, setFeedbackType, onCorrect, onIncorrect }) {
+  const { a, answer } = problem;
+  const [userAnswer, setUserAnswer] = useState('');
+  const [status, setStatus] = useState('');
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    setUserAnswer(''); setStatus('');
+    if (inputRef.current) setTimeout(() => inputRef.current.focus(), 100);
+  }, [problem]);
+
+  const handleChange = (v) => {
+    if (v.length > 2) v = v.slice(-2);
+    if (v && !/^\d+$/.test(v)) return;
+    setUserAnswer(v);
+  };
+
+  const doCheck = () => {
+    setChecked(true);
+    if (userAnswer === String(answer)) {
+      setStatus('correct');
+      setFeedback('⚽ MÅÅÅL! Snyggt jobbat!'); setFeedbackType('goal'); onCorrect();
+    } else {
+      setStatus('incorrect');
+      setFeedback(`Inte riktigt! √${a} = ${answer}.`); setFeedbackType('miss'); onIncorrect();
+    }
+  };
+
+  const handleKey = (e) => { if (e.key === 'Enter' && !checked && userAnswer) doCheck(); };
+
+  return (
+    <div className="workspace">
+      <div className="problem-question">Vad är roten ur {a}?</div>
+
+      <div className="sqrt-display">
+        <div className="sqrt-symbol">√</div>
+        <div className="sqrt-radicand-wrap">
+          <span className="sqrt-radicand">{a}</span>
+        </div>
+        <span className="sqrt-equals">=</span>
+        <input
+          ref={inputRef}
+          className={`sqrt-input ${status}`}
+          type="text"
+          inputMode="numeric"
+          maxLength={2}
+          value={userAnswer}
+          onChange={e => handleChange(e.target.value)}
+          onKeyDown={handleKey}
+          disabled={checked}
+          autoFocus
+        />
+      </div>
+
+      {!checked && (
+        <div className="btn-row" style={{marginTop: 4}}>
+          <button className="btn btn-check" onClick={doCheck}>✅ Kolla svar</button>
         </div>
       )}
     </div>
